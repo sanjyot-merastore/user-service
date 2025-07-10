@@ -1,8 +1,5 @@
 ﻿using FluentAssertions;
 
-using MeraStore.Services.User.Application;
-using MeraStore.Services.User.Application.Behaviours;
-using MeraStore.Services.User.Domain.Entities;
 using MeraStore.Shared.Kernel.Core.Events;
 using MeraStore.Shared.Kernel.Persistence.Interfaces;
 using MeraStore.Shared.Kernel.WebApi.Interfaces;
@@ -34,7 +31,7 @@ public class ArchitectureTests : BaseTests
   {
     var entityTypes = Types.InAssembly(DomainAssembly)
       .That()
-      .Inherit(typeof(SampleEntity))
+      .Inherit(typeof(User.Domain.Entities.User))
       .GetTypes();
     var failingTypes = new List<Type>();
     foreach (var entityType in entityTypes)

@@ -7,7 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="MeraStore.Shared.Kernel.Http" Version="1.0.3" />
+    <PackageReference Include="MeraStore.Shared.Kernel.Http" Version="1.0.4" />
   </ItemGroup>
 
   <ItemGroup>

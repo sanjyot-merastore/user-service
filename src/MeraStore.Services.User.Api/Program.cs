@@ -1,8 +1,11 @@
-using MeraStore.Services.User.Api.Middlewares.Extensions;
+﻿using MeraStore.Services.User.Api.Middlewares.Extensions;
 using MeraStore.Services.User.Common;
 using MeraStore.Services.User.Infrastructure;
+using MeraStore.Services.User.Persistence;
 using MeraStore.Shared.Kernel.WebApi;
 using MeraStore.Shared.Kernel.WebApi.Extensions;
+
+using Microsoft.EntityFrameworkCore;
 
 namespace MeraStore.Services.User.Api;
 
@@ -11,11 +14,15 @@ namespace MeraStore.Services.User.Api;
 /// </summary>
 public class Program
 {
-  public static void Main(string[] args)
+  /// <summary>
+  /// 
+  /// </summary>
+  /// <param name="args"></param>
+  public static async Task Main(string[] args)
   {
     var builder = CreateWebApplicationBuilder(args);
-    var app = BuildWebApplication(builder);
-    app.Run();
+    var app = await BuildWebApplication(builder);
+    await app.RunAsync();
   }
 
   /// <summary>
@@ -43,7 +50,7 @@ public class Program
   /// </summary>
   /// <param name="builder"></param>
   /// <returns></returns>
-  public static WebApplication BuildWebApplication(WebApplicationBuilder builder)
+  public static async Task<WebApplication> BuildWebApplication(WebApplicationBuilder builder)
   {
     var app = builder.Build();
 
@@ -54,9 +61,33 @@ public class Program
     app.UseMeraStoreLogging();
     app.UseHttpsRedirection();
 
+    //Apply database migrations on startup with logging
+    using (var scope = app.Services.CreateScope())
+    {
+      var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+      var logger = app.Services.GetRequiredService<ILogger<Program>>();
+
+      await RunMigrations(logger, dbContext);
+    }
+
     app.MapEndpoints();
     app.MapControllers();
 
     return app;
+  }
+
+  static async Task RunMigrations(ILogger<Program> logger, AppDbContext appDbContext)
+  {
+    try
+    {
+      logger.LogInformation("Applying database migrations...");
+      await appDbContext.Database.MigrateAsync();
+      logger.LogInformation("✅ Database migrations applied successfully.");
+    }
+    catch (Exception ex)
+    {
+      logger.LogError(ex, "❌ Error applying database migrations.");
+
+    }
   }
 }
