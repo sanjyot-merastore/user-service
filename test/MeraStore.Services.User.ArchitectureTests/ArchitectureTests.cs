@@ -53,7 +53,7 @@ public class ArchitectureTests : BaseTests
   {
     var result = Types.InAssembly(PersistenceAssembly)
         .ShouldNot()
-        .HaveDependencyOn(ApplicationAssemblyName)
+        .HaveDependencyOn(InfrastructureAssemblyName)
         .GetResult();
 
     result.IsSuccessful.Should().BeTrue("Persistence layer should not depend on Application layer.");
